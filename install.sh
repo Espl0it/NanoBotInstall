@@ -103,6 +103,42 @@ else
 fi
 
 echo ""
+print_step "安装额外技能..."
+echo ""
+
+# 检查并安装 ClawHub CLI
+if ! command -v clawhub &> /dev/null; then
+    print_step "安装 ClawHub CLI..."
+    if command -v npm &> /dev/null; then
+        npm install -g clawhub
+        print_success "ClawHub CLI 安装完成"
+    elif command -v pip3 &> /dev/null; then
+        pip3 install clawhub
+        print_success "ClawHub CLI 安装完成"
+    else
+        print_warning "无法安装 ClawHub CLI，请手动安装: npm install -g clawhub"
+    fi
+else
+    print_success "ClawHub CLI 已安装"
+fi
+
+# 安装额外技能
+if command -v clawhub &> /dev/null; then
+    print_step "安装 tavily-search 技能..."
+    clawhub install tavily-search || print_warning "tavily-search 安装可能失败"
+    
+    print_step "安装 find-skills 技能..."
+    clawhub install find-skills || print_warning "find-skills 安装可能失败"
+    
+    print_step "安装 proactive-agent-1-2-4 技能..."
+    clawhub install proactive-agent-1-2-4 || print_warning "proactive-agent-1-2-4 安装可能失败"
+    
+    print_success "额外技能安装完成"
+else
+    print_warning "跳过技能安装 (ClawHub CLI 未找到)"
+fi
+
+echo ""
 print_step "初始化配置..."
 mkdir -p ~/.nanobot
 mkdir -p ~/.nanobot/workspace

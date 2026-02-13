@@ -19,6 +19,7 @@
 - 🔧 **多平台支持** - 支持 Telegram、Discord、Feishu 等 10 个平台
 - 🤖 **多LLM提供商** - 支持 OpenRouter、Claude、GPT、DeepSeek 等 12 个提供商
 - 📦 **开箱即用** - 简单配置即可开始使用
+- 🛠️ **技能增强** - 自动安装 tavily-search、find-skills、proactive-agent 等实用技能
 
 ## 📚 目录
 
@@ -94,6 +95,16 @@ nanobot gateway
 ```bash
 curl -sSL https://raw.githubusercontent.com/Espl0it/NanoBotInstall/main/install.sh | bash
 ```
+
+此脚本将自动：
+- 检查并安装依赖（Python 3.11+, Git, pip）
+- 安装 nanobot
+- 安装 ClawHub CLI（如果可用）
+- 安装增强技能包：
+  - `tavily-search` - AI优化网络搜索
+  - `find-skills` - 技能查找工具
+  - `proactive-agent-1-2-4` - 主动式Agent
+- 创建默认配置文件
 
 ### 方式二：uv 安装（稳定快速）
 
