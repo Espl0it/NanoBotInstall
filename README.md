@@ -443,6 +443,7 @@ NanoBotInstall/
 - [nanobot PyPI](https://pypi.org/project/nanobot-ai/)
 - [OpenRouter](https://openrouter.ai)
 - [LiteLLM](https://github.com/BerriAI/litellm)
+- [完整安装指南 (Quarto Markdown)](NanoBot_Installation_Guide.qmd)
 
 ## 🤝 贡献
 
