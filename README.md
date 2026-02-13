@@ -444,6 +444,7 @@ NanoBotInstall/
 - [OpenRouter](https://openrouter.ai)
 - [LiteLLM](https://github.com/BerriAI/litellm)
 - [完整安装指南 (Quarto Markdown)](NanoBot_Installation_Guide.qmd)
+- [安装脚本 (Quarto Markdown)](NanoBot_Install_Script.qmd)
 
 ## 🤝 贡献
 
