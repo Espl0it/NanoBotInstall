@@ -588,7 +588,7 @@ NanoBotInstall/
 ## 🙏 致谢
 
 - [HKUDS](https://github.com/HKUDS) - nanobot 原作者
-- [OpenClaw](https://github.com/openclaw/openclaw) - 灵感来源
+- [OpenClaw](https://github.com/openclaw/openclaw) - 参考框架
 
 ---
 
