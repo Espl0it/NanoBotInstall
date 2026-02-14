@@ -112,7 +112,7 @@ if command -v uv &> /dev/null; then
 else
     # 方式2: pip安装
     print_step "使用 pip 安装 nanobot..."
-    pip3 install -U nanobot-ai
+    pip3 install -U nanobot-ai --break-system-packages
     print_success "nanobot 安装完成 (pip 方式)"
 fi
 
@@ -127,7 +127,7 @@ if ! command -v clawhub &> /dev/null; then
         npm install -g clawhub
         print_success "ClawHub CLI 安装完成"
     elif command -v pip3 &> /dev/null; then
-        pip3 install clawhub
+        pip3 install clawhub --break-system-packages
         print_success "ClawHub CLI 安装完成"
     else
         print_warning "无法安装 ClawHub CLI，请手动安装: npm install -g clawhub"
