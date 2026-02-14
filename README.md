@@ -32,6 +32,8 @@
 - [配置说明](#-配置说明)
 - [使用教程](#-使用教程)
 - [支持的频道](#-支持的频道)
+- [qmd 本地记忆引擎](#-qmd-本地记忆引擎)
+- [GitHub 推送](#-github-推送)
 - [常见问题](#-常见问题)
 - [进阶配置](#-进阶配置)
 
@@ -47,7 +49,7 @@
 
 ```bash
 # 方式1: 直接下载安装脚本执行
-curl -sSL https://raw.githubusercontent.com/Espl0it/NanoBotInstall/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Espl0it/NanoBotInstall/master/install.sh | bash
 
 # 方式2: 克隆本仓库后执行
 git clone https://github.com/Espl0it/NanoBotInstall.git
@@ -97,7 +99,7 @@ nanobot gateway
 ### 方式一：一键脚本安装（推荐）
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Espl0it/NanoBotInstall/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Espl0it/NanoBotInstall/master/install.sh | bash
 ```
 
 **此脚本将自动完成以下操作：**
@@ -266,7 +268,7 @@ docker run -v ~/.nanobot:/root/.nanobot -p 18790:18790 nanobot gateway
 
 ### 概述
 
-qmd 是 Shopify 创始人 Tobi 用 Rust 写的本地语义搜索引擎，专为 AI Agent 设计。它能够：
+**qmd** 是 Shopify 创始人 Tobi 用 Rust 写的本地语义搜索引擎，专为 AI Agent 设计。它能够：
 
 - 📚 **混合检索** - BM25 全文检索 + 向量语义检索 + LLM 重排序
 - 💾 **完全本地运行** - 无需外部 API，保护隐私
@@ -371,6 +373,66 @@ qmd 方案：
 qmd search daily-logs "之前讨论过什么" --hybrid
 ```
 **实测准确率：约 93%**
+
+## 🔗 GitHub 推送
+
+本项目已准备好推送到 GitHub。
+
+### 方式一：使用 GitHub CLI (推荐)
+
+```bash
+# 安装 GitHub CLI (如果未安装)
+brew install gh  # macOS
+# 或
+apt install gh   # Ubuntu/Debian
+
+# 登录 GitHub
+gh auth login
+
+# 创建远程仓库并推送
+gh repo create NanoBotInstall --public --source=. --push
+```
+
+### 方式二：使用 Git 命令行
+
+```bash
+# 设置远程仓库
+git remote add origin https://github.com/Espl0it/NanoBotInstall.git
+
+  # 推送主分支
+  git branch -M master
+  git push -u origin master
+```
+
+### 方式三：使用推送脚本
+
+```bash
+# 直接执行推送脚本
+./push_to_github.sh
+
+# 或设置 Token 后执行
+GITHUB_TOKEN=xxx ./push_to_github.sh
+```
+
+### 设置 GitHub Token (如需)
+
+如果遇到权限错误，需要设置 GitHub Token：
+
+```bash
+# 方式1: 环境变量
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+
+# 方式2: git credential
+git config --global credential.helper store
+```
+
+获取 Token: https://github.com/settings/tokens
+
+### 验证推送
+
+推送成功后，访问 https://github.com/Espl0it/NanoBotInstall 确认项目已上传。
+
+## 📱 支持的频道
 
 | 频道 | 难度 | 说明 |
 |------|------|------|
@@ -487,6 +549,36 @@ nanobot onboard
 
 是的！请查看 [Docker 部署](#docker-部署)
 
+### Q6: qmd 模型下载失败怎么办？
+
+```bash
+# 手动触发下载
+qmd --help
+
+# 检查网络连接
+curl -I https://github.com
+
+# 检查磁盘空间
+df -h
+```
+
+### Q7: 检索无结果怎么办？
+
+```bash
+# 查看所有记忆库
+qmd list
+
+# 检查集合名称是否正确
+qmd search daily-logs "test" --hybrid
+
+# 检查文件是否存在
+ls -la ~/.nanobot/workspace/*.md
+
+# 重新创建记忆库
+qmd collection add ~/.nanobot/workspace/*.md --name nanobot-memory
+qmd embed nanobot-memory ~/.nanobot/workspace/*.md
+```
+
 ## 🔒 安全建议
 
 1. **限制工作目录** - 在配置中设置 `"restrictToWorkspace": true`
@@ -498,9 +590,12 @@ nanobot onboard
 
 ```
 NanoBotInstall/
-├── install.sh          # 一键安装脚本
-├── README.md           # 本文档
-└── .gitignore         # Git忽略文件
+├── install.sh              # 一键安装脚本
+├── push_to_github.sh       # GitHub 推送脚本
+├── README.md               # 主文档（本文档）
+├── CHANGELOG.md            # 更新日志
+├── LICENSE                 # MIT 许可证
+└── .gitignore              # Git 忽略文件
 ```
 
 ## 🛠️ 进阶配置
@@ -564,8 +659,8 @@ NanoBotInstall/
 - [nanobot PyPI](https://pypi.org/project/nanobot-ai/)
 - [OpenRouter](https://openrouter.ai)
 - [LiteLLM](https://github.com/BerriAI/litellm)
-- [完整安装指南 (Quarto Markdown)](NanoBot_Installation_Guide.qmd)
-- [安装脚本 (Quarto Markdown)](NanoBot_Install_Script.qmd)
+- [qmd GitHub](https://github.com/tobi/qmd)
+- [MCP 协议文档](https://modelcontextprotocol.io)
 
 ## 🤝 贡献
 
@@ -589,6 +684,7 @@ NanoBotInstall/
 
 - [HKUDS](https://github.com/HKUDS) - nanobot 原作者
 - [OpenClaw](https://github.com/openclaw/openclaw) - 参考框架
+- [Tobi](https://github.com/tobi) - qmd 作者
 
 ---
 
