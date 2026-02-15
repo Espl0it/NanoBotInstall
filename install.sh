@@ -139,15 +139,42 @@ fi
 # 安装额外技能
 if command -v clawhub &> /dev/null; then
     print_step "安装 tavily-search 技能..."
-    clawhub install tavily-search || print_warning "tavily-search 安装可能失败"
+    if clawhub install tavily-search --force > /dev/null 2>&1; then
+        print_success "tavily-search 安装成功"
+    else
+        print_warning "tavily-search 安装失败，尝试使用 --force..."
+        if clawhub install tavily-search --force > /dev/null 2>&1; then
+            print_success "tavily-search 安装成功"
+        else
+            print_warning "tavily-search 安装失败（可选技能）"
+        fi
+    fi
     
-    print_step "安装 find-skills 技能..."
-    clawhub install find-skills || print_warning "find-skills 安装可能失败"
+    print_step "安装 skill-finder 技能..."
+    if clawhub install skill-finder --force > /dev/null 2>&1; then
+        print_success "skill-finder 安装成功"
+    else
+        print_warning "skill-finder 安装失败，尝试使用 --force..."
+        if clawhub install skill-finder --force > /dev/null 2>&1; then
+            print_success "skill-finder 安装成功"
+        else
+            print_warning "skill-finder 安装失败（可选技能）"
+        fi
+    fi
     
-    print_step "安装 proactive-agent-1-2-4 技能..."
-    clawhub install proactive-agent-1-2-4 || print_warning "proactive-agent-1-2-4 安装可能失败"
+    print_step "安装 proactive-agent 技能..."
+    if clawhub install proactive-agent --force > /dev/null 2>&1; then
+        print_success "proactive-agent 安装成功"
+    else
+        print_warning "proactive-agent 安装失败，尝试使用 --force..."
+        if clawhub install proactive-agent --force > /dev/null 2>&1; then
+            print_success "proactive-agent 安装成功"
+        else
+            print_warning "proactive-agent 安装失败（可选技能）"
+        fi
+    fi
     
-    print_success "额外技能安装完成"
+    print_success "技能安装检查完成"
 else
     print_warning "跳过技能安装 (ClawHub CLI 未找到)"
 fi
