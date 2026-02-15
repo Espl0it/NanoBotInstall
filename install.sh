@@ -127,6 +127,49 @@ check_pip() {
     fi
 }
 
+# 安装 Node.js 和 npm（如需要）
+install_nodejs_npm() {
+    if check_command npm && check_command node; then
+        local node_version
+        node_version=$(node --version 2>&1 || echo "unknown")
+        local npm_version
+        npm_version=$(npm --version 2>&1 || echo "unknown")
+        print_success "Node.js 和 npm 已安装: Node.js $node_version, npm $npm_version"
+        return 0
+    fi
+    
+    print_warning "Node.js 或 npm 未安装，将尝试安装..."
+    
+    if check_command apt-get; then
+        print_step "使用 apt 安装 Node.js 和 npm..."
+        sudo apt update && sudo apt install -y nodejs npm || {
+            print_error "Node.js 和 npm 安装失败"
+            return 1
+        }
+        print_success "Node.js 和 npm 安装完成"
+        return 0
+    elif check_command yum; then
+        print_step "使用 yum 安装 Node.js 和 npm..."
+        sudo yum install -y nodejs npm || {
+            print_error "Node.js 和 npm 安装失败"
+            return 1
+        }
+        print_success "Node.js 和 npm 安装完成"
+        return 0
+    elif check_command brew; then
+        print_step "使用 brew 安装 Node.js 和 npm..."
+        brew install node || {
+            print_error "Node.js 和 npm 安装失败"
+            return 1
+        }
+        print_success "Node.js 和 npm 安装完成"
+        return 0
+    else
+        print_error "无法自动安装 Node.js 和 npm，请手动安装"
+        return 1
+    fi
+}
+
 # 安装 nanobot
 install_nanobot() {
     print_step "安装 nanobot..."
@@ -165,32 +208,46 @@ install_clawhub() {
     
     print_step "安装 ClawHub CLI..."
     
-    # 优先使用 npm 安装（ClawHub 主要通过 npm 分发）
-    if check_command npm; then
-        print_info "使用 npm 安装 ClawHub CLI..."
-        npm install -g clawhub 2>&1 | grep -v "npm WARN" || {
-            # 检查是否真的安装成功
-            if check_command clawhub; then
-                print_success "ClawHub CLI 安装完成"
-                return 0
-            else
-                print_warning "ClawHub CLI 安装失败，技能安装将被跳过"
-                print_info "提示: 技能安装是可选的，不影响 nanobot 核心功能"
-                return 1
-            fi
-        }
-        # 再次确认安装成功
-        if check_command clawhub; then
-            print_success "ClawHub CLI 安装完成"
-            return 0
+    # 检查并安装 Node.js 和 npm（如需要）
+    if ! check_command npm; then
+        print_info "npm 未安装，尝试自动安装 Node.js 和 npm..."
+        if ! install_nodejs_npm; then
+            print_warning "无法安装 Node.js 和 npm，跳过 ClawHub CLI 安装"
+            print_info "提示: 技能安装是可选的，不影响 nanobot 核心功能"
+            print_info "如需安装技能，请手动安装 Node.js 和 npm: sudo apt update && sudo apt install -y nodejs npm"
+            return 1
         fi
     fi
     
-    # 如果 npm 不可用，提供清晰的提示
-    print_warning "无法安装 ClawHub CLI (需要 npm)"
-    print_info "提示: 技能安装是可选的，不影响 nanobot 核心功能"
-    print_info "如需安装技能，请先安装 Node.js 和 npm，然后运行: npm install -g clawhub"
-    return 1
+    # 确认 npm 可用
+    if ! check_command npm; then
+        print_warning "npm 不可用，跳过 ClawHub CLI 安装"
+        print_info "提示: 技能安装是可选的，不影响 nanobot 核心功能"
+        return 1
+    fi
+    
+    # 使用 npm 安装 ClawHub CLI
+    print_info "使用 npm 安装 ClawHub CLI..."
+    npm install -g clawhub 2>&1 | grep -v "npm WARN" || {
+        # 检查是否真的安装成功
+        if check_command clawhub; then
+            print_success "ClawHub CLI 安装完成"
+            return 0
+        else
+            print_warning "ClawHub CLI 安装失败，技能安装将被跳过"
+            print_info "提示: 技能安装是可选的，不影响 nanobot 核心功能"
+            return 1
+        fi
+    }
+    
+    # 再次确认安装成功
+    if check_command clawhub; then
+        print_success "ClawHub CLI 安装完成"
+        return 0
+    else
+        print_warning "ClawHub CLI 安装可能失败"
+        return 1
+    fi
 }
 
 # 安装额外技能
@@ -202,7 +259,6 @@ install_skills() {
     if ! install_clawhub; then
         print_warning "跳过技能安装 (ClawHub CLI 未安装)"
         print_info "提示: 这些技能是可选的增强功能，不影响 nanobot 核心使用"
-        print_info "如需安装技能，请先安装 Node.js: curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt-get install -y nodejs"
         return 1
     fi
     
