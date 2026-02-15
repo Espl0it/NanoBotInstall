@@ -408,10 +408,10 @@ git remote add origin https://github.com/Espl0it/NanoBotInstall.git
 
 ```bash
 # 直接执行推送脚本
-./push_to_github.sh
+./git-commit.sh
 
 # 或设置 Token 后执行
-GITHUB_TOKEN=xxx ./push_to_github.sh
+GITHUB_TOKEN=xxx ./git-commit.sh
 ```
 
 ### 设置 GitHub Token (如需)
@@ -591,7 +591,7 @@ qmd embed nanobot-memory ~/.nanobot/workspace/*.md
 ```
 NanoBotInstall/
 ├── install.sh              # 一键安装脚本
-├── push_to_github.sh       # GitHub 推送脚本
+├── git-commit.sh           # Git 提交和推送脚本
 ├── README.md               # 主文档（本文档）
 ├── CHANGELOG.md            # 更新日志
 ├── LICENSE                 # MIT 许可证
