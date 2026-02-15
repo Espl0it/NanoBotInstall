@@ -164,44 +164,78 @@ install_clawhub() {
     fi
     
     print_step "安装 ClawHub CLI..."
+    
+    # 优先使用 npm 安装（ClawHub 主要通过 npm 分发）
     if check_command npm; then
-        npm install -g clawhub || {
-            print_warning "ClawHub CLI 安装可能失败，请手动安装: npm install -g clawhub"
-            return 1
+        print_info "使用 npm 安装 ClawHub CLI..."
+        npm install -g clawhub 2>&1 | grep -v "npm WARN" || {
+            # 检查是否真的安装成功
+            if check_command clawhub; then
+                print_success "ClawHub CLI 安装完成"
+                return 0
+            else
+                print_warning "ClawHub CLI 安装失败，技能安装将被跳过"
+                print_info "提示: 技能安装是可选的，不影响 nanobot 核心功能"
+                return 1
+            fi
         }
-        print_success "ClawHub CLI 安装完成"
-        return 0
-    elif check_command pip3; then
-        pip3 install clawhub --break-system-packages || {
-            print_warning "ClawHub CLI 安装可能失败"
-            return 1
-        }
-        print_success "ClawHub CLI 安装完成"
-        return 0
-    else
-        print_warning "无法安装 ClawHub CLI，请手动安装: npm install -g clawhub"
-        return 1
+        # 再次确认安装成功
+        if check_command clawhub; then
+            print_success "ClawHub CLI 安装完成"
+            return 0
+        fi
     fi
+    
+    # 如果 npm 不可用，提供清晰的提示
+    print_warning "无法安装 ClawHub CLI (需要 npm)"
+    print_info "提示: 技能安装是可选的，不影响 nanobot 核心功能"
+    print_info "如需安装技能，请先安装 Node.js 和 npm，然后运行: npm install -g clawhub"
+    return 1
 }
 
 # 安装额外技能
 install_skills() {
     echo ""
-    print_step "安装额外技能..."
+    print_step "安装额外技能 (可选)..."
     echo ""
     
     if ! install_clawhub; then
-        print_warning "跳过技能安装 (ClawHub CLI 未找到)"
+        print_warning "跳过技能安装 (ClawHub CLI 未安装)"
+        print_info "提示: 这些技能是可选的增强功能，不影响 nanobot 核心使用"
+        print_info "如需安装技能，请先安装 Node.js: curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt-get install -y nodejs"
+        return 1
+    fi
+    
+    # 确认 clawhub 命令可用
+    if ! check_command clawhub; then
+        print_warning "ClawHub CLI 未正确安装，跳过技能安装"
         return 1
     fi
     
     local skills=("tavily-search" "find-skills" "proactive-agent-1-2-4")
+    local installed_count=0
+    local failed_count=0
+    
     for skill in "${skills[@]}"; do
         print_step "安装 $skill 技能..."
-        clawhub install "$skill" || print_warning "$skill 安装可能失败"
+        if clawhub install "$skill" > /dev/null 2>&1; then
+            print_success "$skill 安装成功"
+            installed_count=$((installed_count + 1))
+        else
+            print_warning "$skill 安装可能失败（这是可选的）"
+            failed_count=$((failed_count + 1))
+        fi
     done
     
-    print_success "额外技能安装完成"
+    if [[ $installed_count -gt 0 ]]; then
+        print_success "已安装 $installed_count 个技能"
+    fi
+    
+    if [[ $failed_count -gt 0 ]]; then
+        print_warning "$failed_count 个技能安装失败，但不影响 nanobot 核心功能"
+    fi
+    
+    return 0
 }
 
 # 安装 Bun
